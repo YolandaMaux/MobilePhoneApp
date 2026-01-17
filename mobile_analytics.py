@@ -415,17 +415,17 @@ if data is not None:
         st.warning("Country column not found in the data. Please ensure your data has a Country column.")
 else:
     st.markdown("---")
-    st.markdown(
-        """
-        Your data is generated entirely in memory from a built-in sample generator.
-        The expected columns are:
+    # st.markdown(
+    #     """
+    #     Your data is generated entirely in memory from a built-in sample generator.
+    #     The expected columns are:
 
-        - Country: Country name (string)
-        - Date: Date in YYYY-MM-DD format (string)
-        - Brand: Phone brand name (e.g., Apple, Samsung, Xiaomi)
-        - OS: Operating system (e.g., iOS, Android, HarmonyOS)
-        - Market_Share: Market share percentage (numeric)
-        - Users_Millions: Number of users in millions (numeric)
-        - Usage_Hours: Average daily usage in hours (numeric)
-        """
-    )
+    #     - Country: Country name (string)
+    #     - Date: Date in YYYY-MM-DD format (string)
+    #     - Brand: Phone brand name (e.g., Apple, Samsung, Xiaomi)
+    #     - OS: Operating system (e.g., iOS, Android, HarmonyOS)
+    #     - Market_Share: Market share percentage (numeric)
+    #     - Users_Millions: Number of users in millions (numeric)
+    #     - Usage_Hours: Average daily usage in hours (numeric)
+    #     """
+    # )
