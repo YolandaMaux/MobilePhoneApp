@@ -5,9 +5,11 @@ import plotly.graph_objects as go
 from PIL import Image
 import base64
 from pathlib import Path
+from generate_sample_data import generate_sample_data  
 
+if "run_button_success" not in st.session_state:
+    st.session_state.run_button_success = False
 
-from generate_sample_data import generate_sample_data  # <-- new: use in-memory generator [file:1]
 
 icon = Image.open("mobieAppLogo.png")  # or .ico, .jpg, etc.
 
@@ -39,6 +41,20 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# Control metric font sizes
+def custom_metric(col, label, value, font_size=20):
+    """Display a custom metric with controllable font size"""
+    col.markdown(f"""
+        <div style='text-align: center;'>
+            <p style='font-size: 14px; margin: 0;'>{label}</p>
+            <p style='font-size: {font_size}px; font-weight: bold; margin: 0;'>{value}</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+# Keep your original code as-is
+
+
 
 def img_to_base64(img_path: str) -> str:
     img_bytes = Path(img_path).read_bytes()
@@ -75,11 +91,11 @@ instructions_text = st.sidebar.text_area("Instructions", height=120)
 st.sidebar.subheader("⏱️ Time Range")
 time_range = st.sidebar.selectbox(
     "Select time range",
-    ["Last 7 days", "Last 30 days", "Last year", "Last 5 years"],
+    ["Last 7 days", "Last 30 days", "Last year", "Last 5 years"], index=2,
 )
 
-st.sidebar.subheader("▶️ Run")
-run_generation = st.sidebar.button("Run")
+#st.sidebar.subheader("▶️ Run")
+#run_generation = st.sidebar.button("Run",)
 
 # Map timerange to something generate_sample_data could use in future (kept for UI only)
 range_map = {
@@ -95,14 +111,52 @@ selected_range_code = range_map.get(time_range, "1y")
 # -----------------------------
 data = None
 
+
+
+
+# Button with color styling based on session state
+col1, col2 = st.sidebar.columns([3, 1])
+with col1:
+    run_generation = st.button("Run", use_container_width=True)
+
+# Apply button color based on success state
+if st.session_state.run_button_success:
+    st.markdown("""
+        <style>
+        button[kind="primary"] {
+            background-color: #28a745 !important;  /* Green */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+        <style>
+        button[kind="primary"] {
+            background-color: #0066cc !important;  /* Blue */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+# if run_generation:
+#     # Directly generate a fresh DataFrame in memory, no Excel involved. [file:1][file:2]
+#     try:
+#         data = generate_sample_data()
+#         st.sidebar.success("Data generated in memory and loaded into the app.")
+#         st.session_state["generated_data"] = data
+#     except Exception as e:
+#         st.sidebar.error(f"Error generating in-memory data: {e}")
+
 if run_generation:
-    # Directly generate a fresh DataFrame in memory, no Excel involved. [file:1][file:2]
     try:
         data = generate_sample_data()
-        st.sidebar.success("Data generated in memory and loaded into the app.")
         st.session_state["generated_data"] = data
+        st.session_state.run_button_success = True  # ✅ Now safe to set
+        st.sidebar.success("Data generated in memory and loaded into the app.")
+        st.rerun()  # Rerun to apply green color
     except Exception as e:
         st.sidebar.error(f"Error generating in-memory data: {e}")
+        st.session_state.run_button_success = False
+
 
 # If user already generated data earlier this session, reuse it.
 if data is None and "generated_data" in st.session_state:
@@ -152,19 +206,37 @@ if data is not None:
             # Top metrics
             col1, col2, col3, col4 = st.columns(4)
 
+            # if "Date" in country_data.columns:
+            #     latest_date = country_data["Date"].max()
+            #     earliest_date = country_data["Date"].min()
+            #     col1.metric("Latest Data Date", str(latest_date.date()) if pd.notnull(latest_date) else "N/A")
+            #     col2.metric("Earliest Data Date", str(earliest_date.date()) if pd.notnull(earliest_date) else "N/A")
+
+            # if "MarketShare" in country_data.columns:
+            #     avg_share = country_data["MarketShare"].mean()
+            #     col3.metric("Average Market Share", f"{avg_share:.2f}")
+
+            # if "UsageHours" in country_data.columns:
+            #     avg_usage = country_data["UsageHours"].mean()
+            #     col4.metric("Average Daily Usage (hours)", f"{avg_usage:.2f}")
+
             if "Date" in country_data.columns:
                 latest_date = country_data["Date"].max()
                 earliest_date = country_data["Date"].min()
-                col1.metric("Latest Data Date", str(latest_date.date()) if pd.notnull(latest_date) else "N/A")
-                col2.metric("Earliest Data Date", str(earliest_date.date()) if pd.notnull(earliest_date) else "N/A")
-
+                custom_metric(col1, "Start Date", str(earliest_date.date()) if pd.notnull(earliest_date) else "N/A", font_size=20)
+                custom_metric(col2, "End Data ", str(latest_date.date()) if pd.notnull(latest_date) else "N/A", font_size=20)
+            
             if "MarketShare" in country_data.columns:
                 avg_share = country_data["MarketShare"].mean()
-                col3.metric("Average Market Share", f"{avg_share:.2f}")
-
+                custom_metric(col3, "Average Market Share", f"{avg_share:.2f}", font_size=20)
+            
             if "UsageHours" in country_data.columns:
                 avg_usage = country_data["UsageHours"].mean()
-                col4.metric("Average Daily Usage (hours)", f"{avg_usage:.2f}")
+                custom_metric(col4, "Average Daily Usage (hours)", f"{avg_usage:.2f}", font_size=20)
+            
+            
+
+
 
             st.markdown("---")
 
