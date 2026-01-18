@@ -79,16 +79,16 @@ st.markdown("---")
 # -----------------------------
 st.sidebar.header("⚙️ Configuration")
 
-st.sidebar.subheader("📚 Sources")
+st.sidebar.subheader("📚 Sources", help="Check the sources to query.")
 source_google_play = st.sidebar.checkbox("Google Play", value=True)
 source_app_store = st.sidebar.checkbox("App Store", value=True)
 source_other = st.sidebar.checkbox("Other", value=False)
 
-st.sidebar.subheader("⚙️ Settings")
+st.sidebar.subheader("⚙️ Settings", help="Add additional info.")
 api_key = st.sidebar.text_input("key")
 instructions_text = st.sidebar.text_area("Instructions", height=120)
 
-st.sidebar.subheader("⏱️ Time Range")
+st.sidebar.subheader("⏱️ Time Range", help="Select the time range for query.")
 time_range = st.sidebar.selectbox(
     "Select time range",
     ["Last 7 days", "Last 30 days", "Last year", "Last 5 years"], index=2,
